@@ -1,0 +1,9 @@
+aiohttp
+aiohttp[speedups]
+sqlalchemy==1.4.44
+asyncpg
+aiosqlite
+bcrypt
+pytest
+requests
+pydantic
