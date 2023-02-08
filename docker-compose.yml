@@ -8,4 +8,4 @@ services:
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: 123
-      POSTGRES_DB: hw_flask
+      POSTGRES_DB: homework

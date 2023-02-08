@@ -1,8 +1,19 @@
+import json
 from typing import Any, Dict, Optional, Type
 
-from pydantic import BaseModel, ValidationError, validator, validate_arguments
+from aiohttp import web
+from pydantic import BaseModel, ValidationError, validate_arguments, validator
 
-from errors import ApiError
+ERROR_TYPE = (
+    Type[web.HTTPUnauthorized] | Type[web.HTTPForbidden] | Type[web.HTTPNotFound]
+)
+
+
+def raise_http_error(error_class: ERROR_TYPE, message: str | dict):
+    raise error_class(
+        text=json.dumps({"status": "error", "description": message}),
+        content_type="application/json",
+    )
 
 
 class CreateAdv(BaseModel):
@@ -13,14 +24,14 @@ class CreateAdv(BaseModel):
 
     @validator("title")
     def check_title(cls, value: str):
-        if len(value) > 60:
-            raise ValueError(f"too long title - {len(value)}")
+        if len(value) > 50:
+            raise_http_error(web.HTTPBadRequest, f'title: "{value}" is too long')
         return value
 
     @validator("descr")
     def check_descr(cls, value: str):
         if len(value) > 200:
-            raise ValueError("too long descr")
+            raise_http_error(web.HTTPBadRequest, f'descr: "{value}" is too long')
         return value
 
 
@@ -33,7 +44,13 @@ class PatchDelAdv(BaseModel):
     @validator("title")
     def check_title(cls, value: str):
         if len(value) > 50:
-            raise ValueError("too long title")
+            raise_http_error(web.HTTPBadRequest, f'title: "{value}" is too long')
+        return value
+
+    @validator("descr")
+    def check_descr(cls, value: str):
+        if len(value) > 200:
+            raise_http_error(web.HTTPBadRequest, f'descr: "{value}" is too long')
         return value
 
 
@@ -47,5 +64,5 @@ async def validate(
     try:
         validated = model_cls(**data)
         return validated.dict(exclude_none=exclude_none)
-    except ValidationError as er:
-        raise ApiError(400, er.errors())
+    except ValidationError:
+        raise_http_error(web.HTTPBadRequest, "wrong arguments in request")

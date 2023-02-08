@@ -1,5 +1,4 @@
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
-                        func)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -28,7 +27,7 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(60), unique=True)
     email = Column(String(60), unique=True)
-    password = Column(String(60), nullable=False)
+    password = Column(String(200), nullable=False)
 
 
 class Adv(Base):

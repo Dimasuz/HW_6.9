@@ -7,3 +7,4 @@ bcrypt
 pytest
 requests
 pydantic
+psycopg2-binary
